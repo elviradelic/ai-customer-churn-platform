@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import FastAPI
 
 from app.schemas import CustomerData, PredictionResponse
+from app.database import get_db_connection
 
 
 app = FastAPI(
@@ -37,18 +38,42 @@ def health_check():
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict_churn(customer: CustomerData):
-
-    customer_df = pd.DataFrame(
-        [customer.model_dump()]
-    )
+    customer_df = pd.DataFrame([customer.model_dump()])
 
     prediction = model.predict(customer_df)[0]
+    churn_probability = model.predict_proba(customer_df)[0][1]
 
-    churn_probability = model.predict_proba(
-        customer_df
-    )[0][1]
+    prediction_label = "churn" if prediction == 1 else "stay"
+    probability = round(float(churn_probability), 4)
+
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO predictions (prediction, churn_probability)
+            VALUES (%s, %s)
+            """,
+            (prediction_label, probability)
+        )
+
+        connection.commit()
+
+    except Exception as error:
+        print(f"Database error: {error}")
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
 
     return {
-        "prediction": "churn" if prediction == 1 else "stay",
-        "churn_probability": round(float(churn_probability), 4)
+        "prediction": prediction_label,
+        "churn_probability": probability
     }
