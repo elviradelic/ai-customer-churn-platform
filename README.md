@@ -25,11 +25,11 @@ Python · Scikit-learn · Pandas · FastAPI · PostgreSQL · Docker · Kubernete
 
 ## Current Status
 
-The machine learning pipeline, FastAPI prediction service, and PostgreSQL integration are currently implemented.
+The machine learning pipeline, FastAPI prediction service, PostgreSQL integration, and Docker containerization are implemented.
 
-Predictions generated through the API are automatically stored in a PostgreSQL database.
+Predictions are automatically stored in PostgreSQL, with persistent storage configured through Docker volumes.
 
-Automated testing, Docker containerization, CI/CD, and Kubernetes deployment will be added in the next development stages.
+Automated testing, CI/CD, and Kubernetes deployment are planned for the next development stages.
 
 ## Run Locally
 
@@ -50,3 +50,31 @@ Open the interactive API documentation at:
 ```text
 http://127.0.0.1:8000/docs
 ```
+
+## Run with Docker
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+DB_NAME=churn_db
+DB_USER=postgres
+DB_PASSWORD=your_password
+```
+
+Build and start the application:
+
+```bash
+docker compose up -d --build
+```
+
+Access the API documentation at:
+
+http://localhost:8000/docs
+
+Stop the application:
+
+```bash
+docker compose down
+```
+
+PostgreSQL data is preserved in a Docker volume between container restarts.

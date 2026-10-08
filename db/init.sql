@@ -1,0 +1,7 @@
+
+CREATE TABLE IF NOT EXISTS predictions (
+    id SERIAL PRIMARY KEY,
+    prediction VARCHAR(10) NOT NULL,
+    churn_probability DOUBLE PRECISION NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
