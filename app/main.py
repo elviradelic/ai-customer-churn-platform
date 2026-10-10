@@ -3,10 +3,13 @@ from pathlib import Path
 import joblib
 import pandas as pd
 from fastapi import FastAPI
+import logging
+from fastapi import HTTPException
 
 from app.schemas import CustomerData, PredictionResponse
 from app.database import get_db_connection
 
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="AI Customer Churn Prediction API",
@@ -63,16 +66,24 @@ def predict_churn(customer: CustomerData):
 
         connection.commit()
 
-    except Exception as error:
-        print(f"Database error: {error}")
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+
+        logger.exception("Failed to save churn prediction")
+
+        raise HTTPException(
+            status_code=503,
+            detail="Prediction storage is temporarily unavailable"
+        )
 
     finally:
-        if cursor:
+        if cursor is not None:
             cursor.close()
 
-        if connection:
+        if connection is not None:
             connection.close()
-
+            
     return {
         "prediction": prediction_label,
         "churn_probability": probability
