@@ -25,11 +25,11 @@ Python · Scikit-learn · Pandas · FastAPI · PostgreSQL · Docker · Kubernete
 
 ## Current Status
 
-The machine learning pipeline, FastAPI prediction service, PostgreSQL integration, and Docker containerization are implemented.
+The machine learning pipeline, FastAPI REST API, PostgreSQL integration, and Docker containerization are implemented.
 
-Predictions are automatically stored in PostgreSQL, with persistent storage configured through Docker volumes.
+The project includes automated API and ML tests using pytest, with GitHub Actions configured to run the test suite on every push and pull request to the main branch.
 
-Automated testing, CI/CD, and Kubernetes deployment are planned for the next development stages.
+Kubernetes deployment is planned for the next development stage.
 
 ## Run Locally
 
